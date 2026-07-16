@@ -1,11 +1,7 @@
 services:
   - type: web
     name: web-qa-suite-backend
-    runtime: node
-    rootDir: server
+    runtime: docker
+    dockerfilePath: server/Dockerfile
+    dockerContext: server
     plan: free
-    buildCommand: npm install && npx playwright install --with-deps chromium
-    startCommand: npm start
-    envVars:
-      - key: NODE_VERSION
-        value: 22
