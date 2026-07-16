@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: web-qa-suite-backend
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install && npx playwright install --with-deps chromium
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22
