@@ -1,0 +1,18 @@
+{
+  "name": "website-qa-server",
+  "version": "1.0.0",
+  "description": "Automated visual/CSS QA backend: measures font sizes, line heights and spacing across breakpoints",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "playwright": "^1.61.1"
+  }
+}
