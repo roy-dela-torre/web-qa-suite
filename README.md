@@ -12,19 +12,22 @@ measuring required.
   - **Audit** — paste a URL, click Run, and get a results table matching the QA
     tracker sheet: page link, section, screenshot thumbnail, breakpoint,
     expected vs. measured value, Pass/Fail/Not&nbsp;Found/Skipped status, and an
-    auto-written remark. Exportable to CSV.
+    auto-written remark. Exportable to CSV or Excel.
   - **SEO** — one click reads a page's `<title>`, `<meta name="description">`
     and `<h1>`. Each shows its actual value, or a "Missing" badge if absent.
     Open Graph tags (`og:title`, `og:description`, ...) are intentionally never
     read — this checks plain on-page SEO basics only. Also flags when a page
-    has more than one `<h1>`.
+    has more than one `<h1>`. Exportable to Excel.
   - **Compare** — enter a staging URL and a live URL; it fetches both and diffs
     headers (h1–h6), paragraphs, links (text + href) and buttons by content,
     flagging each as Match / Missing on Live / Added on Live / Count differs.
     Useful for confirming a redesign/revamp on staging carried over the same
     copy as the live site. A dedicated "Evaluate page H1 tag" box shows, per
     side: H1 count, a Single/Multiple/Missing H1 status badge, and the exact
-    value(s) — listed as H1-1, H1-2, ... when there's more than one.
+    value(s) — listed as H1-1, H1-2, ... when there's more than one. Exportable
+    to Excel as a workbook with a separate sheet per section (H1 Evaluation,
+    Headers, Paragraphs, Links, Buttons) — mirroring how the original tracker
+    used separate tabs.
   - **Standards** — an editable table matching the "Font Sizes" reference sheet
     (breakpoints × H1/H2/H3/paragraph, min/max px per cell) plus a generic
     spacing table (any CSS selector + property, e.g. section bottom padding,
@@ -49,6 +52,31 @@ npm run dev
 
 Open http://localhost:5173. The Vite dev server proxies `/api/*` to the backend,
 so no CORS config is needed.
+
+## Deployment
+
+**Vercel hosts the frontend only.** `vercel.json` at the repo root tells Vercel
+to build just `client/` (`cd client && npm run build`, output `client/dist`) —
+that's what fixes the 404 you'd otherwise get from Vercel trying to build the
+repo root, which has no `package.json`.
+
+The **backend cannot run on Vercel** as a serverless function: it launches a
+real headless Chromium via Playwright for 10-30+ seconds per audit, and
+Playwright's browser binaries are far larger than what fits in a serverless
+function bundle. Deploy `server/` somewhere that runs a persistent Node
+process instead — Render, Railway, Fly.io, or a small VPS all work; just make
+sure the build step runs `npx playwright install --with-deps chromium`.
+
+Once the backend has a public URL, point the deployed frontend at it:
+
+- In the Vercel project's **Settings → Environment Variables**, add
+  `VITE_API_BASE_URL` = `https://your-backend-host.example.com` (no trailing
+  slash), then redeploy.
+- Locally, leave it unset — `client/vite.config.js` proxies `/api/*` to
+  `localhost:5175` for you.
+
+If `VITE_API_BASE_URL` is missing in a production build, the app shows a
+banner telling you to set it instead of failing silently on every request.
 
 ## Customizing standards
 
@@ -80,3 +108,9 @@ the in-memory React state for `localStorage`.
 - **SEO** and **Compare** both load pages at a single default viewport (no
   breakpoint switching) since meta tags, headings and links don't change
   across screen sizes.
+- Excel export uses `exceljs`, loaded on demand (dynamic `import()`) only when
+  an "Export Excel" button is clicked, so its ~270&nbsp;kB (gzipped) doesn't
+  bloat the initial page load. We use `exceljs` rather than the more common
+  `xlsx` (SheetJS) package — the npm-published `xlsx` has unpatched
+  high-severity advisories (prototype pollution, ReDoS) in its file-parsing
+  code path with no fix available on the registry.

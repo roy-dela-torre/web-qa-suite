@@ -18,6 +18,17 @@ export default function SeoChecker() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [data, setData] = useState(null)
+  const [exportingExcel, setExportingExcel] = useState(false)
+
+  const exportExcel = async () => {
+    setExportingExcel(true)
+    try {
+      const { exportSeoCheck } = await import('../excel.js')
+      await exportSeoCheck(data)
+    } finally {
+      setExportingExcel(false)
+    }
+  }
 
   const check = async () => {
     setError(null)
@@ -52,6 +63,11 @@ export default function SeoChecker() {
         <button className="run-btn" onClick={check} disabled={loading || !url}>
           {loading ? 'Checking…' : 'Check SEO'}
         </button>
+        {data && (
+          <button className="export-btn" onClick={exportExcel} disabled={exportingExcel}>
+            {exportingExcel ? 'Exporting…' : 'Export Excel'}
+          </button>
+        )}
       </div>
       {error && <div className="error-box">{error}</div>}
 

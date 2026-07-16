@@ -1,5 +1,11 @@
+// In local dev this stays empty and requests go through the Vite proxy
+// (see vite.config.js). In production (e.g. Vercel), set VITE_API_BASE_URL
+// to wherever the backend is actually deployed — Vercel only hosts this
+// static frontend, not the Playwright backend (see README).
+const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
+
 async function postJson(path, payload) {
-  const res = await fetch(path, {
+  const res = await fetch(`${API_BASE}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

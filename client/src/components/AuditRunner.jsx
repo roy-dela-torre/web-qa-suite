@@ -17,6 +17,17 @@ export default function AuditRunner({ breakpoints, elements, fontStandards, spac
   const [breakpointFilter, setBreakpointFilter] = useState('All')
   const [statusFilter, setStatusFilter] = useState('All')
   const [lightbox, setLightbox] = useState(null)
+  const [exportingExcel, setExportingExcel] = useState(false)
+
+  const exportExcel = async () => {
+    setExportingExcel(true)
+    try {
+      const { exportAuditResults } = await import('../excel.js')
+      await exportAuditResults(results)
+    } finally {
+      setExportingExcel(false)
+    }
+  }
 
   const runAudit = async () => {
     setError(null)
@@ -78,9 +89,14 @@ export default function AuditRunner({ breakpoints, elements, fontStandards, spac
           {loading ? 'Auditing…' : 'Run audit'}
         </button>
         {results.length > 0 && (
-          <button className="export-btn" onClick={() => downloadCsv('website-qa-results.csv', resultsToCsv(results))}>
-            Export CSV
-          </button>
+          <>
+            <button className="export-btn" onClick={() => downloadCsv('website-qa-results.csv', resultsToCsv(results))}>
+              Export CSV
+            </button>
+            <button className="export-btn" onClick={exportExcel} disabled={exportingExcel}>
+              {exportingExcel ? 'Exporting…' : 'Export Excel'}
+            </button>
+          </>
         )}
       </div>
       {error && <div className="error-box">{error}</div>}

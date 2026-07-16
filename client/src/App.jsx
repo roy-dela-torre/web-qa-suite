@@ -19,8 +19,17 @@ export default function App() {
   const [spacing, setSpacing] = useState(defaultSpacingStandards)
   const [tolerance, setTolerance] = useState(defaultTolerancePx)
 
+  const missingBackendConfig = import.meta.env.PROD && !import.meta.env.VITE_API_BASE_URL
+
   return (
     <div className="app">
+      {missingBackendConfig && (
+        <div className="error-box banner-warning">
+          No backend URL configured. This deployment only serves the frontend — set{' '}
+          <code>VITE_API_BASE_URL</code> in your hosting provider's environment variables to point at where the
+          Playwright backend is running, then redeploy.
+        </div>
+      )}
       <header className="app-header">
         <h1>Website QA</h1>
         <nav className="tabs">

@@ -110,6 +110,17 @@ export default function CompareContent() {
   const [error, setError] = useState(null)
   const [data, setData] = useState(null)
   const [sectionFilter, setSectionFilter] = useState('All')
+  const [exportingExcel, setExportingExcel] = useState(false)
+
+  const exportExcel = async () => {
+    setExportingExcel(true)
+    try {
+      const { exportCompareResults } = await import('../excel.js')
+      await exportCompareResults(data)
+    } finally {
+      setExportingExcel(false)
+    }
+  }
 
   const compare = async () => {
     setError(null)
@@ -161,6 +172,11 @@ export default function CompareContent() {
         <button className="run-btn" onClick={compare} disabled={loading || !stagingUrl || !liveUrl}>
           {loading ? 'Comparing…' : 'Compare'}
         </button>
+        {data && (
+          <button className="export-btn" onClick={exportExcel} disabled={exportingExcel}>
+            {exportingExcel ? 'Exporting…' : 'Export Excel'}
+          </button>
+        )}
       </div>
       {error && <div className="error-box">{error}</div>}
       {loading && <div className="hint">Loading both pages and diffing content…</div>}

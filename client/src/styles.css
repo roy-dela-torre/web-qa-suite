@@ -269,6 +269,16 @@ th, td {
   font-size: 13px;
 }
 
+.banner-warning {
+  margin: 20px 0 0;
+}
+
+.banner-warning code {
+  background: rgba(0, 0, 0, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
 .summary-row {
   display: flex;
   gap: 10px;
