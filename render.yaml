@@ -5,3 +5,6 @@ services:
     dockerfilePath: server/Dockerfile
     dockerContext: server
     plan: free
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false

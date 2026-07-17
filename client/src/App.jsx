@@ -3,6 +3,7 @@ import StandardsEditor from './components/StandardsEditor.jsx'
 import AuditRunner from './components/AuditRunner.jsx'
 import SeoChecker from './components/SeoChecker.jsx'
 import CompareContent from './components/CompareContent.jsx'
+import ChatAI from './components/ChatAI.jsx'
 import {
   defaultBreakpoints,
   defaultElements,
@@ -45,11 +46,14 @@ export default function App() {
           <button className={tab === 'standards' ? 'active' : ''} onClick={() => setTab('standards')}>
             Standards
           </button>
+          <button className={tab === 'chat' ? 'active' : ''} onClick={() => setTab('chat')}>
+            AI Chat
+          </button>
         </nav>
       </header>
 
       <main>
-        {tab === 'audit' && (
+        <div hidden={tab !== 'audit'}>
           <AuditRunner
             breakpoints={breakpoints}
             elements={elements}
@@ -57,10 +61,14 @@ export default function App() {
             spacing={spacing}
             tolerance={tolerance}
           />
-        )}
-        {tab === 'seo' && <SeoChecker />}
-        {tab === 'compare' && <CompareContent />}
-        {tab === 'standards' && (
+        </div>
+        <div hidden={tab !== 'seo'}>
+          <SeoChecker />
+        </div>
+        <div hidden={tab !== 'compare'}>
+          <CompareContent />
+        </div>
+        <div hidden={tab !== 'standards'}>
           <StandardsEditor
             breakpoints={breakpoints}
             setBreakpoints={setBreakpoints}
@@ -73,8 +81,15 @@ export default function App() {
             tolerance={tolerance}
             setTolerance={setTolerance}
           />
-        )}
+        </div>
+        <div hidden={tab !== 'chat'}>
+          <ChatAI />
+        </div>
       </main>
+
+      <footer className="app-footer">
+        © {new Date().getFullYear()} <a href="https://roydetorre.com/" target="_blank" rel="noreferrer">chusie kokoro</a>. All rights reserved.
+      </footer>
     </div>
   )
 }
