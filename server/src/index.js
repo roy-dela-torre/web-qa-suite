@@ -3,7 +3,6 @@ import cors from 'cors'
 import { runAudit } from './audit.js'
 import { extractSeo } from './seo.js'
 import { compareContent } from './compare.js'
-import { sendChatMessage } from './chat.js'
 import {
   defaultBreakpoints,
   defaultElements,
@@ -94,21 +93,6 @@ app.post('/api/compare', async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: err.message || 'Compare failed.' })
-  }
-})
-
-app.post('/api/chat', async (req, res) => {
-  const { messages } = req.body || {}
-  if (!Array.isArray(messages) || !messages.length) {
-    return res.status(400).json({ error: 'messages must be a non-empty array.' })
-  }
-
-  try {
-    const reply = await sendChatMessage(messages)
-    res.json({ reply })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: err.message || 'Chat request failed.' })
   }
 })
 

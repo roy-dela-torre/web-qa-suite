@@ -27,8 +27,3 @@ export async function runSeoCheck(url) {
 export async function runCompare(stagingUrl, liveUrl) {
   return postJson('/api/compare', { stagingUrl, liveUrl })
 }
-
-export async function sendChatMessage(messages) {
-  const data = await postJson('/api/chat', { messages })
-  return data.reply
-}
