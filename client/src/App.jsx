@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { NavLink, Navigate, Route, Routes } from 'react-router-dom'
 import StandardsEditor from './components/StandardsEditor.jsx'
 import AuditRunner from './components/AuditRunner.jsx'
 import SeoChecker from './components/SeoChecker.jsx'
 import CompareContent from './components/CompareContent.jsx'
+import Crawler from './components/Crawler.jsx'
 import {
   defaultBreakpoints,
   defaultElements,
@@ -11,8 +13,9 @@ import {
   defaultTolerancePx,
 } from './defaultStandards.js'
 
+const navClass = ({ isActive }) => (isActive ? 'active' : '')
+
 export default function App() {
-  const [tab, setTab] = useState('audit')
   const [breakpoints, setBreakpoints] = useState(defaultBreakpoints)
   const [elements, setElements] = useState(defaultElements)
   const [fontStandards, setFontStandards] = useState(defaultFontStandards)
@@ -33,51 +36,61 @@ export default function App() {
       <header className="app-header">
         <h1>Website QA</h1>
         <nav className="tabs">
-          <button className={tab === 'audit' ? 'active' : ''} onClick={() => setTab('audit')}>
+          <NavLink to="/audit" className={navClass}>
             Audit
-          </button>
-          <button className={tab === 'seo' ? 'active' : ''} onClick={() => setTab('seo')}>
+          </NavLink>
+          <NavLink to="/seo" className={navClass}>
             SEO
-          </button>
-          <button className={tab === 'compare' ? 'active' : ''} onClick={() => setTab('compare')}>
+          </NavLink>
+          <NavLink to="/compare" className={navClass}>
             Compare
-          </button>
-          <button className={tab === 'standards' ? 'active' : ''} onClick={() => setTab('standards')}>
+          </NavLink>
+          <NavLink to="/crawler" className={navClass}>
+            Crawler
+          </NavLink>
+          <NavLink to="/standards" className={navClass}>
             Standards
-          </button>
+          </NavLink>
         </nav>
       </header>
 
       <main>
-        <div hidden={tab !== 'audit'}>
-          <AuditRunner
-            breakpoints={breakpoints}
-            elements={elements}
-            fontStandards={fontStandards}
-            spacing={spacing}
-            tolerance={tolerance}
+        <Routes>
+          <Route path="/" element={<Navigate to="/audit" replace />} />
+          <Route
+            path="/audit"
+            element={
+              <AuditRunner
+                breakpoints={breakpoints}
+                elements={elements}
+                fontStandards={fontStandards}
+                spacing={spacing}
+                tolerance={tolerance}
+              />
+            }
           />
-        </div>
-        <div hidden={tab !== 'seo'}>
-          <SeoChecker />
-        </div>
-        <div hidden={tab !== 'compare'}>
-          <CompareContent />
-        </div>
-        <div hidden={tab !== 'standards'}>
-          <StandardsEditor
-            breakpoints={breakpoints}
-            setBreakpoints={setBreakpoints}
-            elements={elements}
-            setElements={setElements}
-            fontStandards={fontStandards}
-            setFontStandards={setFontStandards}
-            spacing={spacing}
-            setSpacing={setSpacing}
-            tolerance={tolerance}
-            setTolerance={setTolerance}
+          <Route path="/seo" element={<SeoChecker />} />
+          <Route path="/compare" element={<CompareContent />} />
+          <Route path="/crawler" element={<Crawler />} />
+          <Route
+            path="/standards"
+            element={
+              <StandardsEditor
+                breakpoints={breakpoints}
+                setBreakpoints={setBreakpoints}
+                elements={elements}
+                setElements={setElements}
+                fontStandards={fontStandards}
+                setFontStandards={setFontStandards}
+                spacing={spacing}
+                setSpacing={setSpacing}
+                tolerance={tolerance}
+                setTolerance={setTolerance}
+              />
+            }
           />
-        </div>
+          <Route path="*" element={<Navigate to="/audit" replace />} />
+        </Routes>
       </main>
 
       <footer className="app-footer">

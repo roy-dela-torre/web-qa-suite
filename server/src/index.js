@@ -3,6 +3,7 @@ import cors from 'cors'
 import { runAudit } from './audit.js'
 import { extractSeo } from './seo.js'
 import { compareContent } from './compare.js'
+import { crawlSite } from './crawl.js'
 import {
   defaultBreakpoints,
   defaultElements,
@@ -93,6 +94,26 @@ app.post('/api/compare', async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: err.message || 'Compare failed.' })
+  }
+})
+
+app.post('/api/crawl', async (req, res) => {
+  const { url, maxPages, maxDepth } = req.body || {}
+  const parsedUrl = parseHttpUrl(url)
+  if (!parsedUrl) {
+    return res.status(400).json({ error: 'url must be a valid http(s) URL.' })
+  }
+
+  try {
+    const data = await crawlSite({
+      startUrl: parsedUrl,
+      maxPages: Number.isFinite(maxPages) && maxPages > 0 ? Math.min(maxPages, 500) : 150,
+      maxDepth: Number.isFinite(maxDepth) && maxDepth > 0 ? Math.min(maxDepth, 10) : 5,
+    })
+    res.json(data)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: err.message || 'Crawl failed.' })
   }
 })
 

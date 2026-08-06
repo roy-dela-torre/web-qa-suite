@@ -92,7 +92,7 @@ body {
   gap: 8px;
 }
 
-.tabs button {
+.tabs a {
   padding: 8px 16px;
   border-radius: 6px;
   border: 1px solid var(--border);
@@ -100,9 +100,10 @@ body {
   color: var(--text);
   cursor: pointer;
   font-size: 14px;
+  text-decoration: none;
 }
 
-.tabs button.active {
+.tabs a.active {
   background: var(--accent);
   color: white;
   border-color: var(--accent);

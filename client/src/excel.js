@@ -83,6 +83,25 @@ function h1EvaluationRows(h1Evaluation) {
   return rows
 }
 
+export async function exportCrawlResults(data, filename = 'website-qa-crawl.xlsx') {
+  const workbook = new ExcelJS.Workbook()
+  addSheet(
+    workbook,
+    'Crawled Pages',
+    [
+      { header: 'URL', key: 'url', width: 55 },
+      { header: 'Parent page', key: 'parentUrl', width: 55 },
+      { header: 'Depth', key: 'depth', width: 8 },
+      { header: 'Status', key: 'statusCode', width: 10 },
+      { header: 'Title', key: 'title', width: 40 },
+      { header: 'Internal links found', key: 'internalLinkCount', width: 18 },
+      { header: 'Error', key: 'error', width: 30 },
+    ],
+    data.pages.map((p) => ({ ...p, parentUrl: p.parentUrl || '(start page)' }))
+  )
+  await downloadWorkbook(workbook, filename)
+}
+
 export async function exportCompareResults(data, filename = 'website-qa-compare.xlsx') {
   const workbook = new ExcelJS.Workbook()
 

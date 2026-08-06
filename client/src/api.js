@@ -27,3 +27,7 @@ export async function runSeoCheck(url) {
 export async function runCompare(stagingUrl, liveUrl) {
   return postJson('/api/compare', { stagingUrl, liveUrl })
 }
+
+export async function runCrawl({ url, maxPages, maxDepth }) {
+  return postJson('/api/crawl', { url, maxPages, maxDepth })
+}

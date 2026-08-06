@@ -8,7 +8,8 @@ measuring required.
   Chromium browser at desktop/tablet/mobile viewport widths, reads the actual
   computed CSS (`font-size`, `line-height`, `padding`, etc.) for the selectors you
   configure, and compares each measurement against your standards.
-- **Frontend** (`client/`): React (Vite). Four tabs:
+- **Frontend** (`client/`): React (Vite) + React Router. Each tab is its own
+  route/page (`/audit`, `/seo`, `/compare`, `/crawler`, `/standards`):
   - **Audit** — paste a URL, click Run, and get a results table matching the QA
     tracker sheet: page link, section, screenshot thumbnail, breakpoint,
     expected vs. measured value, Pass/Fail/Not&nbsp;Found/Skipped status, and an
@@ -28,6 +29,14 @@ measuring required.
     to Excel as a workbook with a separate sheet per section (H1 Evaluation,
     Headers, Paragraphs, Links, Buttons) — mirroring how the original tracker
     used separate tabs.
+  - **Crawler** — enter a start URL and crawl every internal link reachable
+    from it — links to other domains are never followed. Each discovered page
+    records its **parent**: the first already-crawled page where a link to it
+    was found (so a blog listing page naturally shows up as the parent of the
+    posts it links to, and so on down the tree), plus its crawl depth, HTTP
+    status, `<title>`, and how many internal links it contains. "Max pages"
+    and "Max depth" cap how far it goes (defaults: 150 pages, depth 5).
+    Exportable to Excel.
   - **Standards** — an editable table matching the "Font Sizes" reference sheet
     (breakpoints × H1/H2/H3/paragraph, min/max px per cell) plus a generic
     spacing table (any CSS selector + property, e.g. section bottom padding,
