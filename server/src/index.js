@@ -97,6 +97,12 @@ app.post('/api/compare', async (req, res) => {
   }
 })
 
+// Streams newline-delimited JSON: one `{ type: 'page', page }` line per page
+// as soon as it's crawled, then a final `{ type: 'done', ... }` (or
+// `{ type: 'error', ... }`) line. A single buffered JSON response would make
+// the client wait for the entire crawl — for a large site that's minutes of
+// silence, which reads as a hang and, on hosts with proxy idle timeouts, can
+// get the connection killed outright before any results ever arrive.
 app.post('/api/crawl', async (req, res) => {
   const { url, maxPages, maxDepth } = req.body || {}
   const parsedUrl = parseHttpUrl(url)
@@ -104,16 +110,25 @@ app.post('/api/crawl', async (req, res) => {
     return res.status(400).json({ error: 'url must be a valid http(s) URL.' })
   }
 
+  res.setHeader('Content-Type', 'application/x-ndjson')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('X-Accel-Buffering', 'no')
+
+  const send = (obj) => res.write(`${JSON.stringify(obj)}\n`)
+
   try {
-    const data = await crawlSite({
+    const result = await crawlSite({
       startUrl: parsedUrl,
-      maxPages: Number.isFinite(maxPages) && maxPages > 0 ? Math.min(maxPages, 500) : 150,
+      maxPages: Number.isFinite(maxPages) && maxPages > 0 ? Math.min(maxPages, 2000) : 150,
       maxDepth: Number.isFinite(maxDepth) && maxDepth > 0 ? Math.min(maxDepth, 10) : 5,
+      onPage: (page) => send({ type: 'page', page }),
     })
-    res.json(data)
+    send({ type: 'done', startUrl: result.startUrl, totalDiscovered: result.totalDiscovered, truncated: result.truncated })
   } catch (err) {
     console.error(err)
-    res.status(500).json({ error: err.message || 'Crawl failed.' })
+    send({ type: 'error', error: err.message || 'Crawl failed.' })
+  } finally {
+    res.end()
   }
 })
 

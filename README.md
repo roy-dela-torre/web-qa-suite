@@ -35,8 +35,13 @@ measuring required.
     was found (so a blog listing page naturally shows up as the parent of the
     posts it links to, and so on down the tree), plus its crawl depth, HTTP
     status, `<title>`, and how many internal links it contains. "Max pages"
-    and "Max depth" cap how far it goes (defaults: 150 pages, depth 5).
-    Exportable to Excel.
+    (up to 2000) and "Max depth" cap how far it goes (defaults: 150 pages,
+    depth 5). Results stream in and appear in the table one page at a time as
+    they're crawled, rather than all at once at the end — useful for watching
+    progress on a large crawl, and it means whatever was found so far survives
+    even if a very large crawl fails partway through. The backend also
+    periodically restarts its headless browser during long crawls to avoid
+    memory buildup. Exportable to Excel.
   - **Standards** — an editable table matching the "Font Sizes" reference sheet
     (breakpoints × H1/H2/H3/paragraph, min/max px per cell) plus a generic
     spacing table (any CSS selector + property, e.g. section bottom padding,
