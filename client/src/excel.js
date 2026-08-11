@@ -93,11 +93,22 @@ export async function exportCrawlResults(data, filename = 'website-qa-crawl.xlsx
       { header: 'Parent page', key: 'parentUrl', width: 55 },
       { header: 'Depth', key: 'depth', width: 8 },
       { header: 'Status', key: 'statusCode', width: 10 },
+      { header: 'Redirected from status', key: 'redirectedFromStatus', width: 20 },
       { header: 'Title', key: 'title', width: 40 },
+      { header: 'Meta description', key: 'metaDescription', width: 50 },
+      { header: 'Schema types', key: 'schemaTypesStr', width: 30 },
       { header: 'Internal links found', key: 'internalLinkCount', width: 18 },
+      { header: 'Duplicate page', key: 'duplicateStr', width: 40 },
       { header: 'Error', key: 'error', width: 30 },
     ],
-    data.pages.map((p) => ({ ...p, parentUrl: p.parentUrl || '(start page)' }))
+    data.pages.map((p) => ({
+      ...p,
+      parentUrl: p.parentUrl || '(start page)',
+      redirectedFromStatus: p.redirected && p.redirectChain?.length ? p.redirectChain[0].status : '',
+      metaDescription: p.metaDescription || '',
+      schemaTypesStr: (p.schemaTypes || []).join(', '),
+      duplicateStr: p.isDuplicate ? `Yes — ${(p.duplicateUrls || []).join(', ')}` : 'No',
+    }))
   )
   await downloadWorkbook(workbook, filename)
 }

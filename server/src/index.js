@@ -123,7 +123,13 @@ app.post('/api/crawl', async (req, res) => {
       maxDepth: Number.isFinite(maxDepth) && maxDepth > 0 ? Math.min(maxDepth, 10) : 5,
       onPage: (page) => send({ type: 'page', page }),
     })
-    send({ type: 'done', startUrl: result.startUrl, totalDiscovered: result.totalDiscovered, truncated: result.truncated })
+    send({
+      type: 'done',
+      startUrl: result.startUrl,
+      totalDiscovered: result.totalDiscovered,
+      truncated: result.truncated,
+      duplicates: result.duplicates,
+    })
   } catch (err) {
     console.error(err)
     send({ type: 'error', error: err.message || 'Crawl failed.' })
