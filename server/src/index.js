@@ -4,6 +4,7 @@ import { runAudit } from './audit.js'
 import { extractSeo } from './seo.js'
 import { compareContent } from './compare.js'
 import { crawlSite } from './crawl.js'
+import { recordFeedback, listFeedback } from './feedback.js'
 import {
   defaultBreakpoints,
   defaultElements,
@@ -136,6 +137,40 @@ app.post('/api/crawl', async (req, res) => {
   } finally {
     res.end()
   }
+})
+
+// Public — anyone using the site can report an issue or request an
+// adjustment via the floating feedback widget. No auth on purpose (visitors
+// aren't logged in), so only a small set of fields is accepted and each is
+// length-capped to keep a stray large payload from bloating the log file.
+app.post('/api/feedback', (req, res) => {
+  const { message, email, pageUrl } = req.body || {}
+  if (!message || typeof message !== 'string' || !message.trim()) {
+    return res.status(400).json({ error: 'message is required.' })
+  }
+
+  const entry = recordFeedback({
+    message: message.trim().slice(0, 5000),
+    email: typeof email === 'string' && email.trim() ? email.trim().slice(0, 200) : null,
+    pageUrl: typeof pageUrl === 'string' ? pageUrl.trim().slice(0, 500) : null,
+    userAgent: req.get('user-agent') || null,
+  })
+  res.json({ ok: true, timestamp: entry.timestamp })
+})
+
+// Protected by FEEDBACK_ADMIN_TOKEN (set on the backend host) so submitted
+// feedback — which may include an email address — isn't readable by anyone
+// who finds the URL. Without the env var set, this stays disabled rather
+// than defaulting to open.
+app.get('/api/feedback', (req, res) => {
+  const adminToken = process.env.FEEDBACK_ADMIN_TOKEN
+  if (!adminToken) {
+    return res.status(501).json({ error: 'FEEDBACK_ADMIN_TOKEN is not configured on the backend.' })
+  }
+  if (req.query.token !== adminToken) {
+    return res.status(401).json({ error: 'Invalid or missing token.' })
+  }
+  res.json({ feedback: listFeedback() })
 })
 
 const PORT = process.env.PORT || 5175

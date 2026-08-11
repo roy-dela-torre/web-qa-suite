@@ -28,6 +28,10 @@ export async function runCompare(stagingUrl, liveUrl) {
   return postJson('/api/compare', { stagingUrl, liveUrl })
 }
 
+export async function submitFeedback({ message, email }) {
+  return postJson('/api/feedback', { message, email, pageUrl: window.location.href })
+}
+
 // The crawl endpoint streams newline-delimited JSON so pages show up as
 // they're found instead of all at once at the end (see server/src/index.js).
 // onPage is called with each page result as soon as it arrives; the resolved

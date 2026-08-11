@@ -42,6 +42,17 @@ measuring required.
     even if a very large crawl fails partway through. The backend also
     periodically restarts its headless browser during long crawls to avoid
     memory buildup. Exportable to Excel.
+  - **Feedback widget** — a floating chat-icon button in the bottom-right
+    corner, present on every tab, so anyone using the tool can report a bug
+    or request an adjustment without leaving the page. Submissions post to
+    `POST /api/feedback` on the backend (message + optional email + the page
+    URL it was sent from) and are appended to a `feedback.jsonl` log file
+    next to the server process, as well as echoed to the server's console —
+    useful because most free hosting tiers (see Deployment below) don't keep
+    a persistent disk, so the console log is the durable copy across
+    redeploys. View submissions via `GET /api/feedback?token=...`, gated by
+    the `FEEDBACK_ADMIN_TOKEN` environment variable — the endpoint stays
+    disabled (501) until that variable is set on the backend host.
   - **Standards** — an editable table matching the "Font Sizes" reference sheet
     (breakpoints × H1/H2/H3/paragraph, min/max px per cell) plus a generic
     spacing table (any CSS selector + property, e.g. section bottom padding,
@@ -91,6 +102,10 @@ Once the backend has a public URL, point the deployed frontend at it:
 
 If `VITE_API_BASE_URL` is missing in a production build, the app shows a
 banner telling you to set it instead of failing silently on every request.
+
+To read submissions from the feedback widget, set `FEEDBACK_ADMIN_TOKEN` on
+the **backend** host (e.g. Render → Environment) to any secret string, then
+visit `https://your-backend-host.example.com/api/feedback?token=<that secret>`.
 
 ## Customizing standards
 

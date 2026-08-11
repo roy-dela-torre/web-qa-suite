@@ -5,6 +5,7 @@ import AuditRunner from './components/AuditRunner.jsx'
 import SeoChecker from './components/SeoChecker.jsx'
 import CompareContent from './components/CompareContent.jsx'
 import Crawler from './components/Crawler.jsx'
+import FeedbackWidget from './components/FeedbackWidget.jsx'
 import {
   defaultBreakpoints,
   defaultElements,
@@ -96,6 +97,8 @@ export default function App() {
       <footer className="app-footer">
         © {new Date().getFullYear()} <a href="https://roydetorre.com/" target="_blank" rel="noreferrer">chusie kokoro</a>. All rights reserved.
       </footer>
+
+      <FeedbackWidget />
     </div>
   )
 }

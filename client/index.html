@@ -3,10 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Website QA</title>
+    <title>Website QA — Typography, SEO &amp; Crawl Auditing Tool</title>
+    <meta
+      name="description"
+      content="Website QA audits a live page's typography and spacing against your own standards, checks on-page SEO basics, diffs staging vs. live content, and crawls a site's internal links — all from the browser."
+    />
+    <meta name="author" content="Roy De La Torre" />
+    <!--
+      Structured data so search engines can attribute this tool to its
+      author's portfolio as an entity relationship (schema.org "author"),
+      independent of the React footer link below which only exists once
+      client-side JS has run.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Website QA",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "author": {
+          "@type": "Person",
+          "name": "Roy De La Torre",
+          "url": "https://roydetorre.com/"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <!--
+      Deliberately static (not React-rendered): this link needs to exist in
+      the raw HTML response to be crawlable by backlink-index tools (Moz,
+      Ahrefs, etc.) that don't execute JavaScript, unlike the app's own
+      footer inside #root which only renders after the JS bundle runs.
+    -->
+    <p class="static-credit">Site by <a href="https://roydetorre.com/" target="_blank" rel="noreferrer">Roy De La Torre</a></p>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
