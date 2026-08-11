@@ -34,14 +34,21 @@ measuring required.
     records its **parent**: the first already-crawled page where a link to it
     was found (so a blog listing page naturally shows up as the parent of the
     posts it links to, and so on down the tree), plus its crawl depth, HTTP
-    status, `<title>`, and how many internal links it contains. "Max pages"
-    (up to 2000) and "Max depth" cap how far it goes (defaults: 150 pages,
-    depth 5). Results stream in and appear in the table one page at a time as
-    they're crawled, rather than all at once at the end — useful for watching
-    progress on a large crawl, and it means whatever was found so far survives
-    even if a very large crawl fails partway through. The backend also
-    periodically restarts its headless browser during long crawls to avoid
-    memory buildup. Exportable to Excel.
+    status (redirect hops like a 301 stay visible instead of only showing the
+    final status), `<title>`, meta description, JSON-LD schema types found on
+    the page, how many internal links it contains, and whether it's a
+    duplicate of another crawled page (same rendered body content, hashed and
+    compared once the crawl finishes). "Max pages" (up to 2000) and "Max
+    depth" cap how far it goes (defaults: 150 pages, depth 5). Results stream
+    in and appear in the table one page at a time as they're crawled, rather
+    than all at once at the end — useful for watching progress on a large
+    crawl, and it means whatever was found so far survives even if a very
+    large crawl fails partway through. The backend also periodically restarts
+    its headless browser during long crawls to avoid memory buildup. A
+    **"Site structure"** view renders the same results as a collapsible
+    parent/child tree instead of a flat table, for visually spotting orphaned
+    sections or overly deep pages. Exportable to Excel, or to a standard
+    **sitemap.xml** (only 2xx pages, one canonical URL per duplicate group).
   - **Feedback widget** — a floating chat-icon button in the bottom-right
     corner, present on every tab, so anyone using the tool can report a bug
     or request an adjustment without leaving the page. Submissions post to

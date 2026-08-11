@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { runCrawl } from '../api.js'
+import CrawlTree from './CrawlTree.jsx'
 
 function StatusCell({ page }) {
   if (page.error) return <span className="badge badge-fail">Error</span>
@@ -41,6 +42,8 @@ export default function Crawler() {
   const [pages, setPages] = useState([])
   const [summary, setSummary] = useState(null)
   const [exportingExcel, setExportingExcel] = useState(false)
+  const [exportingSitemap, setExportingSitemap] = useState(false)
+  const [view, setView] = useState('table')
 
   const run = async () => {
     setError(null)
@@ -105,6 +108,16 @@ export default function Crawler() {
     }
   }
 
+  const exportSitemap = async () => {
+    setExportingSitemap(true)
+    try {
+      const { exportSitemap: buildSitemap } = await import('../sitemap.js')
+      await buildSitemap(pages)
+    } finally {
+      setExportingSitemap(false)
+    }
+  }
+
   return (
     <div className="panel">
       <h2>Crawl internal links</h2>
@@ -153,6 +166,11 @@ export default function Crawler() {
             {exportingExcel ? 'Exporting…' : 'Export Excel'}
           </button>
         )}
+        {pages.length > 0 && (
+          <button className="export-btn" onClick={exportSitemap} disabled={exportingSitemap}>
+            {exportingSitemap ? 'Exporting…' : 'Export sitemap.xml'}
+          </button>
+        )}
       </div>
       {error && <div className="error-box">{error}</div>}
       {loading && (
@@ -175,56 +193,75 @@ export default function Crawler() {
       )}
 
       {pages.length > 0 && (
-        <div className="table-wrap">
-          <table className="results-table">
-            <thead>
-              <tr>
-                <th>URL</th>
-                <th>Parent page</th>
-                <th>Depth</th>
-                <th>Status</th>
-                <th>Title</th>
-                <th>Meta description</th>
-                <th>Schema</th>
-                <th>Internal links found</th>
-                <th>Duplicate</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pages.map((p) => (
-                <tr key={p.url}>
-                  <td className="page-link-cell">
-                    <a href={p.url} target="_blank" rel="noreferrer">
-                      {p.url}
-                    </a>
-                  </td>
-                  <td className="page-link-cell">
-                    {p.parentUrl ? (
-                      <a href={p.parentUrl} target="_blank" rel="noreferrer">
-                        {p.parentUrl}
-                      </a>
-                    ) : (
-                      <em>(start page)</em>
-                    )}
-                  </td>
-                  <td>{p.depth}</td>
-                  <td>
-                    <StatusCell page={p} />
-                  </td>
-                  <td>{p.title || '—'}</td>
-                  <td>{p.metaDescription || '—'}</td>
-                  <td>
-                    <SchemaCell page={p} />
-                  </td>
-                  <td>{p.internalLinkCount}</td>
-                  <td>
-                    <DuplicateCell page={p} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <div className="view-toggle">
+            <button
+              type="button"
+              className={view === 'table' ? 'active' : ''}
+              onClick={() => setView('table')}
+            >
+              Table
+            </button>
+            <button type="button" className={view === 'tree' ? 'active' : ''} onClick={() => setView('tree')}>
+              Site structure
+            </button>
+          </div>
+
+          {view === 'table' ? (
+            <div className="table-wrap">
+              <table className="results-table">
+                <thead>
+                  <tr>
+                    <th>URL</th>
+                    <th>Parent page</th>
+                    <th>Depth</th>
+                    <th>Status</th>
+                    <th>Title</th>
+                    <th>Meta description</th>
+                    <th>Schema</th>
+                    <th>Internal links found</th>
+                    <th>Duplicate</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pages.map((p) => (
+                    <tr key={p.url}>
+                      <td className="page-link-cell">
+                        <a href={p.url} target="_blank" rel="noreferrer">
+                          {p.url}
+                        </a>
+                      </td>
+                      <td className="page-link-cell">
+                        {p.parentUrl ? (
+                          <a href={p.parentUrl} target="_blank" rel="noreferrer">
+                            {p.parentUrl}
+                          </a>
+                        ) : (
+                          <em>(start page)</em>
+                        )}
+                      </td>
+                      <td>{p.depth}</td>
+                      <td>
+                        <StatusCell page={p} />
+                      </td>
+                      <td>{p.title || '—'}</td>
+                      <td>{p.metaDescription || '—'}</td>
+                      <td>
+                        <SchemaCell page={p} />
+                      </td>
+                      <td>{p.internalLinkCount}</td>
+                      <td>
+                        <DuplicateCell page={p} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <CrawlTree pages={pages} />
+          )}
+        </>
       )}
     </div>
   )
