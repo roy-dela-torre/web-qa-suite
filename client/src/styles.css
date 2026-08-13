@@ -156,6 +156,10 @@ th, td {
   vertical-align: middle;
 }
 
+th {
+  white-space: nowrap;
+}
+
 .selector-row th {
   background: var(--panel);
   padding-top: 4px;

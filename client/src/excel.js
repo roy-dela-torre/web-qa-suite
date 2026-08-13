@@ -96,6 +96,7 @@ export async function exportCrawlResults(data, filename = 'website-qa-crawl.xlsx
       { header: 'Redirected from status', key: 'redirectedFromStatus', width: 20 },
       { header: 'Title', key: 'title', width: 40 },
       { header: 'Meta description', key: 'metaDescription', width: 50 },
+      { header: 'Canonical URL', key: 'canonicalUrl', width: 55 },
       { header: 'Schema types', key: 'schemaTypesStr', width: 30 },
       { header: 'Internal links found', key: 'internalLinkCount', width: 18 },
       { header: 'Duplicate page', key: 'duplicateStr', width: 40 },
@@ -106,6 +107,7 @@ export async function exportCrawlResults(data, filename = 'website-qa-crawl.xlsx
       parentUrl: p.parentUrl || '(start page)',
       redirectedFromStatus: p.redirected && p.redirectChain?.length ? p.redirectChain[0].status : '',
       metaDescription: p.metaDescription || '',
+      canonicalUrl: p.canonicalUrl || '',
       schemaTypesStr: (p.schemaTypes || []).join(', '),
       duplicateStr: p.isDuplicate ? `Yes — ${(p.duplicateUrls || []).join(', ')}` : 'No',
     }))

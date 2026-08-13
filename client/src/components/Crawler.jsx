@@ -17,6 +17,16 @@ function StatusCell({ page }) {
   return <span className={`badge ${cls}`}>{page.statusCode}</span>
 }
 
+function CanonicalCell({ page }) {
+  if (!page.canonicalUrl) return <span className="badge badge-skipped">None</span>
+  if (page.canonicalUrl === page.url) return <span className="badge badge-pass">Self</span>
+  return (
+    <a href={page.canonicalUrl} target="_blank" rel="noreferrer" title={page.canonicalUrl}>
+      {page.canonicalUrl}
+    </a>
+  )
+}
+
 function SchemaCell({ page }) {
   if (!page.schemaTypes || page.schemaTypes.length === 0) {
     return <span className="badge badge-skipped">None</span>
@@ -218,6 +228,7 @@ export default function Crawler() {
                     <th>Status</th>
                     <th>Title</th>
                     <th>Meta description</th>
+                    <th>Canonical</th>
                     <th>Schema</th>
                     <th>Internal links found</th>
                     <th>Duplicate</th>
@@ -246,6 +257,9 @@ export default function Crawler() {
                       </td>
                       <td>{p.title || '—'}</td>
                       <td>{p.metaDescription || '—'}</td>
+                      <td className="page-link-cell">
+                        <CanonicalCell page={p} />
+                      </td>
                       <td>
                         <SchemaCell page={p} />
                       </td>

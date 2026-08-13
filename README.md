@@ -35,8 +35,10 @@ measuring required.
     was found (so a blog listing page naturally shows up as the parent of the
     posts it links to, and so on down the tree), plus its crawl depth, HTTP
     status (redirect hops like a 301 stay visible instead of only showing the
-    final status), `<title>`, meta description, JSON-LD schema types found on
-    the page, how many internal links it contains, and whether it's a
+    final status), `<title>`, meta description, `<link rel="canonical">`
+    target (flagged as "Self" when it points back at the page's own URL),
+    JSON-LD schema types found on the page, how many internal links it
+    contains, and whether it's a
     duplicate of another crawled page (same rendered body content, hashed and
     compared once the crawl finishes). "Max pages" (up to 2000) and "Max
     depth" cap how far it goes (defaults: 150 pages, depth 5). Results stream

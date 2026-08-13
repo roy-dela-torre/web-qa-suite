@@ -49,6 +49,7 @@ async function visitPage(browser, item, ctx) {
   let redirectChain = []
   let metaDescription = null
   let schemaTypes = []
+  let canonicalUrl = null
   let contentHash = null
 
   try {
@@ -89,16 +90,31 @@ async function visitPage(browser, item, ctx) {
         }
       })
 
+      const canonicalEl = document.querySelector('link[rel="canonical"]')
+      let canonicalUrl = null
+      if (canonicalEl?.getAttribute('href')) {
+        try {
+          // Resolve relative hrefs (e.g. "/page") against the document's own
+          // base URL rather than the crawled URL string, so <base href> tags
+          // are respected the same way a real browser would apply them.
+          canonicalUrl = new URL(canonicalEl.getAttribute('href'), document.baseURI).toString()
+        } catch {
+          canonicalUrl = null
+        }
+      }
+
       const contentText = clean(document.body ? document.body.innerText : '')
 
       return {
         metaDescription: metaDescription || null,
         schemaTypes: Array.from(new Set(schemaTypes)),
+        canonicalUrl,
         contentText,
       }
     })
     metaDescription = pageData.metaDescription
     schemaTypes = pageData.schemaTypes
+    canonicalUrl = pageData.canonicalUrl
     // Hashing normalized body text (rather than title/meta alone) catches
     // pages that render the same content under different URLs — the usual
     // definition of "duplicate page" for SEO purposes.
@@ -155,6 +171,7 @@ async function visitPage(browser, item, ctx) {
     title,
     metaDescription,
     schemaTypes,
+    canonicalUrl,
     contentHash,
     internalLinkCount,
     error,
